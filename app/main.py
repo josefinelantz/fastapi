@@ -53,12 +53,13 @@ def get_posts():
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 #Take in payload validate according to post schema
 def create_posts(post: Post):
-	post_dict = post.dict()
-	# Generate an id
-	post_dict['id'] = randrange(0, 1000000)
-	# Convert Post to a dictionary and append to array
-	my_posts.append(post_dict)
-	return{"data": post_dict}
+	cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (post.title, post.content, post.published))
+
+	new_post = cursor.fetchone()
+	conn.commit()
+	return{"data": new_post}
+
+	
 
 @app.get("/posts/{id}")	
 def get_post(id: int):
