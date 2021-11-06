@@ -1,11 +1,16 @@
 from typing import Optional
-from fastapi import FastAPI, Response, HTTPException, status
+from fastapi import FastAPI, Response, HTTPException, status, Depends
 from fastapi.param_functions import Body
 from pydantic import BaseModel
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from . import models
+from .database import engine, get_db
+from sqlalchemy.orm import Session
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -24,18 +29,6 @@ while True:
 		print("Connection failed")
 		print("error: ", error)
 		time.sleep(2)
-
-my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, {"title": "favourite foods", "content": "I like pizza", "id": 2}]
-
-def find_post(id):
-	for p in my_posts:
-		if p["id"] == id:
-			return p
-
-def find_index_post(id):
-	for i, p in enumerate(my_posts):
-		if p["id"] == id:
-			return i
 
 # Route || Path operation is referenced by decorator @
 @app.get("/")
@@ -86,3 +79,7 @@ def update_post(id: int, post: Post):
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist ")
 	# return updated post
 	return {"data": updated_post}
+
+@app.get("/sqlalchemy")
+def test_posts(db: Session = Depends(get_db)):
+	return { status: "success"}
