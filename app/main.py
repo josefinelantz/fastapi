@@ -3,6 +3,9 @@ from fastapi import FastAPI, Response, HTTPException, status
 from fastapi.param_functions import Body
 from pydantic import BaseModel
 from random import randrange
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import time
 
 app = FastAPI()
 
@@ -11,7 +14,16 @@ class Post(BaseModel):
 	title: str
 	content: str
 	published: bool = True
-	rating: Optional[int] = None
+while True:
+	try: 
+		conn = psycopg2.connect(host="localhost", database="fastapi", user="postgres", password="root", cursor_factory=RealDictCursor)
+		cursor = conn.cursor()
+		print("Database connection was successful")
+		break
+	except Exception as error: 
+		print("Connection failed")
+		print("error: ", error)
+		time.sleep(2)
 
 my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, {"title": "favourite foods", "content": "I like pizza", "id": 2}]
 
@@ -33,8 +45,10 @@ async def root():
 
 @app.get("/posts")
 def get_posts():
+	cursor.execute("""select * from posts """)
+	posts = cursor.fetchall()
 	# FastApi converts the array to JSON
-	return{"data": my_posts}
+	return{"data": posts}
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 #Take in payload validate according to post schema
