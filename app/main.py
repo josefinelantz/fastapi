@@ -59,11 +59,10 @@ def create_posts(post: Post):
 	conn.commit()
 	return{"data": new_post}
 
-	
-
 @app.get("/posts/{id}")	
 def get_post(id: int):
-	post = find_post(id)
+	cursor.execute(""" SELECT * from posts WHERE id = %s """, (str(id)))
+	post = cursor.fetchone()
 	if not post: 
 		raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
 	return{"post_detail": post}
