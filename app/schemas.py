@@ -39,5 +39,4 @@ class Token(BaseModel):
 	token_type: str
 
 class TokenData(BaseModel):
-	id: Optional[str]
-	created_at: datetime
+	id: Optional[str] = None
