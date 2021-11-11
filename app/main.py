@@ -20,5 +20,4 @@ app.include_router(auth.router)
 
 @app.get("/")
 async def root():
-	# Return Python dictionary, FastAPI interprets it to JSON
 	return {"message": " my API"}
