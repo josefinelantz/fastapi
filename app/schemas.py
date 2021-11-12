@@ -14,6 +14,7 @@ class PostCreate(PostBase):
 class Post(PostBase):
 	id: int
 	created_at: datetime
+	owner_id: int
 	# By default Pydantic works with dictionaries, so we tell it to be a model and not a dictionary
 	class Config:
 		orm_mode = True
